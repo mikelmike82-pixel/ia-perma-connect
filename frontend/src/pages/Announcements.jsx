@@ -95,14 +95,14 @@ export default function Announcements() {
 
             {a.fileType === 'image' && (
               <img
-                src={`http://localhost:5000${a.fileUrl}`}
+                src={`{import.meta.env.VITE_SOCKET_URL}${a.fileUrl}`}
                 alt="Attachment"
                 className="mt-3 rounded-xl max-h-80 object-cover border border-slate-200"
               />
             )}
             {a.fileType === 'document' && (
               <a
-                href={`http://localhost:5000${a.fileUrl}`}
+                href={`{import.meta.env.VITE_SOCKET_URL}${a.fileUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 inline-flex items-center gap-2 text-sm text-primary hover:underline"

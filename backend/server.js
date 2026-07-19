@@ -11,7 +11,7 @@ const server = http.createServer(app);
 // Set up Socket.IO on top of our HTTP server
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
     methods: ['GET', 'POST'],
   },
 });
@@ -20,7 +20,9 @@ const io = new Server(server, {
 app.set('io', io);
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
+}));
 app.use('/uploads', express.static('uploads'));
 
 app.get('/', (req, res) => {

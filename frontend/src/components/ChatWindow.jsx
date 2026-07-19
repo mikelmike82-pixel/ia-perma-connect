@@ -170,9 +170,9 @@ const headerName = conversation?.isGroup
 
                 {/* Image message */}
                 {msg.fileType === 'image' && (
-                  <a href={`http://localhost:5000${msg.fileUrl}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`{import.meta.env.VITE_SOCKET_URL}${msg.fileUrl}`} target="_blank" rel="noopener noreferrer">
                     <img
-                      src={`http://localhost:5000${msg.fileUrl}`}
+                      src={`{import.meta.env.VITE_SOCKET_URL}${msg.fileUrl}`}
                       alt="Shared image"
                       className="rounded-2xl max-w-[280px] max-h-72 object-cover mb-1 border border-slate-200"
                     />
@@ -182,7 +182,7 @@ const headerName = conversation?.isGroup
                 {/* Document message */}
                 {msg.fileType === 'document' && (
                   <a
-                    href={`http://localhost:5000${msg.fileUrl}`}
+                    href={`{import.meta.env.VITE_SOCKET_URL}${msg.fileUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`flex items-center gap-3 px-4 py-3 rounded-2xl mb-1 border
