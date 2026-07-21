@@ -91,7 +91,7 @@ export default function StatsDashboard() {
               return (
                 <a
                   key={file.id}
-                  href={msg.fileUrl}
+                  href={file.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 hover:bg-slate-50 -mx-2 px-2 py-1.5 rounded-lg transition-colors"
