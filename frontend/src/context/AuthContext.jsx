@@ -17,17 +17,28 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return;
     }
-
-    api.get('/auth/me')
+api.get('/auth/me')
       .then((res) => {
         setUser(res.data.user);
         socket.connect();
         socket.emit('register', res.data.user.id);
       })
-      .catch(() => {
-        localStorage.removeItem('ia_perma_token');
-        localStorage.removeItem('ia_perma_user');
-        setUser(null);
+      .catch((err) => {
+        // Only log the user out if the SERVER explicitly rejected the token.
+        // Network errors, timeouts, or a sleeping backend should NOT log the user out.
+        if (err.response && err.response.status === 401) {
+          localStorage.removeItem('ia_perma_token');
+          localStorage.removeItem('ia_perma_user');
+          setUser(null);
+        } else {
+          // Fall back to the cached user while we retry, instead of logging out
+          const cachedUser = localStorage.getItem('ia_perma_user');
+          if (cachedUser) {
+            setUser(JSON.parse(cachedUser));
+            socket.connect();
+            socket.emit('register', JSON.parse(cachedUser).id);
+          }
+        }
       })
       .finally(() => {
         setLoading(false);

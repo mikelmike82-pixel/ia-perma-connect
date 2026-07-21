@@ -33,13 +33,13 @@ const createAnnouncement = async (req, res) => {
       return res.status(400).json({ message: 'Title and content are required' });
     }
 
-    let fileUrl = null;
+let fileUrl = null;
     let fileType = null;
 
     if (req.file) {
-      fileUrl = `/uploads/${req.file.filename}`;
-      const ext = require('path').extname(req.file.filename).toLowerCase();
-      fileType = ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext) ? 'image' : 'document';
+      fileUrl = req.file.path;
+      const ext = req.file.originalname.split('.').pop().toLowerCase();
+      fileType = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext) ? 'image' : 'document';
     }
 
     const announcement = await prisma.announcement.create({

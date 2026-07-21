@@ -26,9 +26,18 @@ export default function ChatWindow({ conversationId, conversation }) {
       .then((res) => setMessages(res.data.messages))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
-
-    // Join this conversation's real-time "room"
+// Join this conversation's real-time "room"
     socket.emit('joinConversation', conversationId);
+
+    // If the socket reconnects (e.g. after the phone was backgrounded or lost signal),
+    // re-join the room and re-fetch messages in case anything was missed
+    const handleReconnect = () => {
+      socket.emit('joinConversation', conversationId);
+      api.get(`/conversations/${conversationId}/messages`)
+        .then((res) => setMessages(res.data.messages))
+        .catch((err) => console.error(err));
+    };
+    socket.on('connect', handleReconnect);
 
     // Listen for new messages arriving live
     const handleNewMessage = (message) => {
@@ -54,11 +63,12 @@ export default function ChatWindow({ conversationId, conversation }) {
     socket.on('userStoppedTyping', handleUserStoppedTyping);
 
     // Cleanup when switching conversations or unmounting
-    return () => {
+return () => {
       socket.emit('leaveConversation', conversationId);
       socket.off('newMessage', handleNewMessage);
       socket.off('userTyping', handleUserTyping);
       socket.off('userStoppedTyping', handleUserStoppedTyping);
+      socket.off('connect', handleReconnect);
       setOthersTyping(false);
     };
   }, [conversationId]);
@@ -170,9 +180,9 @@ const headerName = conversation?.isGroup
 
                 {/* Image message */}
                 {msg.fileType === 'image' && (
-                  <a href={`{import.meta.env.VITE_SOCKET_URL}${msg.fileUrl}`} target="_blank" rel="noopener noreferrer">
+                 <a href={msg.fileUrl} target="_blank" rel="noopener noreferrer">
                     <img
-                      src={`{import.meta.env.VITE_SOCKET_URL}${msg.fileUrl}`}
+                      src={msg.fileUrl}
                       alt="Shared image"
                       className="rounded-2xl max-w-[280px] max-h-72 object-cover mb-1 border border-slate-200"
                     />
@@ -182,7 +192,7 @@ const headerName = conversation?.isGroup
                 {/* Document message */}
                 {msg.fileType === 'document' && (
                   <a
-                    href={`{import.meta.env.VITE_SOCKET_URL}${msg.fileUrl}`}
+                   href={msg.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`flex items-center gap-3 px-4 py-3 rounded-2xl mb-1 border

@@ -102,7 +102,7 @@ export default function Announcements() {
             )}
             {a.fileType === 'document' && (
               <a
-                href={`{import.meta.env.VITE_SOCKET_URL}${a.fileUrl}`}
+                href={msg.fileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 inline-flex items-center gap-2 text-sm text-primary hover:underline"

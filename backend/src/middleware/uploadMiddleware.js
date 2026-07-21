@@ -1,24 +1,22 @@
 const multer = require('multer');
-const path = require('path');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../utils/cloudinary');
 
-// Allowed file types, matching your spec
 const allowedTypes = /jpeg|jpg|png|gif|webp|pdf|docx|xlsx|pptx|zip|txt|doc|xls|ppt/;
 
-// Where and how to save uploaded files
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../../uploads'));
-  },
-  filename: (req, file, cb) => {
-    // Unique name: timestamp + random number + original extension
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+// Store files directly on Cloudinary instead of local disk,
+// so they survive server restarts/redeploys on Render's free tier
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'ia-perma-connect',
+    // 'auto' lets Cloudinary correctly handle both images and raw documents
+    resource_type: 'auto',
   },
 });
 
-// Reject files that aren't in our allowed list
 const fileFilter = (req, file, cb) => {
-  const ext = path.extname(file.originalname).toLowerCase().replace('.', '');
+  const ext = file.originalname.split('.').pop().toLowerCase();
   if (allowedTypes.test(ext)) {
     cb(null, true);
   } else {
